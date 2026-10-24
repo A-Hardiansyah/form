@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Form Input Barang</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 24px 16px;
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+    }
+
+    .container {
+      max-width: 480px;
+      margin: 20px auto;
+      padding: 26px;
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 5px 22px #00000010;
+    }
+
+    h2 { margin-top: 0; }
+    .subtitle { color: #64748b; font-size: 14px; }
+
+    label {
+      display: block;
+      margin: 17px 0 7px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      font-size: 15px;
+    }
+
+    input:focus {
+      outline: 2px solid #93c5fd;
+      border-color: #2563eb;
+    }
+
+    button {
+      width: 100%;
+      padding: 13px;
+      margin-top: 22px;
+      background: #2563eb;
+      color: white;
+      font-weight: bold;
+      font-size: 15px;
+      border: none;
+      border-radius: 7px;
+      cursor: pointer;
+    }
+
+    button:disabled { opacity: .6; cursor: wait; }
+    #status { margin-top: 16px; font-size: 14px; }
+    .success { color: #15803d; }
+    .error { color: #dc2626; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h2>Form Input Barang</h2>
+    <p class="subtitle">Lengkapi seluruh kolom bertanda wajib.</p>
+
+    <form
+      id="formBarang"
+      action="https://script.google.com/macros/s/AKfycbyGUEo96sFVlRqQ2Vb_Fh77IpJfNYpQt4USYgs7PMaJivAg_1qaU3x8shb-vMO5zsTo/exec"
+      method="POST"
+      target="hasilSubmit"
+    >
+      <label for="kode">Kode Barang *</label>
+      <input id="kode" name="kode_barang" required>
+
+      <label for="nama">Nama Barang *</label>
+      <input id="nama" name="nama_barang" required>
+
+      <label for="ticket">Nomor Ticket *</label>
+      <input id="ticket" name="nomor_ticket" required>
+
+      <label for="qty">Qty *</label>
+      <input id="qty" name="qty" type="number"
+        min="1" step="1" required>
+
+      <label for="teknisi">Teknisi *</label>
+      <input id="teknisi" name="teknisi" required>
+
+      <button id="submitBtn" type="submit">Simpan Data</button>
+      <div id="status" role="status" aria-live="polite"></div>
+    </form>
+
+    <iframe name="hasilSubmit" title="Hasil penyimpanan"
+      hidden></iframe>
+  </main>
+
+  <script>
+    const form = document.getElementById("formBarang");
+    const btn = document.getElementById("submitBtn");
+    const status = document.getElementById("status");
+
+    let sedangMengirim = false;
+
+    form.addEventListener("submit", function () {
+      if (sedangMengirim) return;
+
+      sedangMengirim = true;
+      btn.disabled = true;
+      btn.textContent = "Menyimpan...";
+      status.textContent = "Sedang mengirim data...";
+      status.className = "";
+    });
+
+    window.addEventListener("message", function (event) {
+      // Pesan hanya diproses jika berasal dari iframe hasil submit.
+      if (event.source !==
+          document.querySelector('iframe[name="hasilSubmit"]').contentWindow) {
+        return;
+      }
+
+      const data = event.data;
+      if (!data || !["success", "error"].includes(data.status)) return;
+
+      sedangMengirim = false;
+      btn.disabled = false;
+      btn.textContent = "Simpan Data";
+      status.textContent = data.message;
+      status.className = data.status;
+
+      if (data.status === "success") {
+        form.reset();
+      }
+    });
+  </script>
+</body>
+</html>
